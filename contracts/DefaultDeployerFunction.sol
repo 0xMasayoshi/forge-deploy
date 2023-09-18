@@ -101,7 +101,7 @@ library DefaultDeployerFunction {
             }
 
             if (deployed == address(0)) {
-                revert(string.concat("Failed to deploy ", name));
+                revert(string(bytes.concat("Failed to deploy ", bytes(name))));
             }
             deployer.save(name, deployed, artifact, args, bytecode);
         } else {

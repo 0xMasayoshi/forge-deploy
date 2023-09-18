@@ -48,9 +48,9 @@ contract TagsReader {
         string memory root = vm.projectRoot();
 
         // TODO configure file name ?
-        string memory path = string.concat(root, "/contexts.json");
+        string memory path = string(bytes.concat(bytes(root), "/contexts.json"));
         string memory json = vm.readFile(path);
-        return stdJson.readStringArray(json, string.concat(".", context, ".tags"));
+        return stdJson.readStringArray(json, string(bytes.concat(".", bytes(context), ".tags")));
     }
 }
 
@@ -184,19 +184,19 @@ contract GlobalDeployer is Deployer {
         // we are using the same context name on different chain, this is an error
         string memory root = vm.projectRoot();
         // TODO? configure deployments folder via deploy.toml / deploy.json
-        string memory path = string.concat(root, "/deployments/", deploymentContext, "/.chainId");
+        string memory path = string(bytes.concat(bytes(root), "/deployments/", bytes(deploymentContext), "/.chainId"));
         try vm.readFile(path) returns (string memory chainId) {
             if (keccak256(bytes(chainId)) != keccak256(bytes(chainIdAsString))) {
                 revert(
-                    string.concat(
+                    string(bytes.concat(
                         "Current chainID: ",
-                        chainIdAsString,
+                        bytes(chainIdAsString),
                         " But Context '",
-                        deploymentContext,
+                        bytes(deploymentContext),
                         "' Already Exists With a Different Chain ID (",
-                        chainId,
+                        bytes(chainId),
                         ")"
-                    )
+                    ))
                 );
             }
         } catch {}
@@ -404,7 +404,7 @@ contract GlobalDeployer is Deployer {
     // TODO if we could read folders, we could load all deployments in the constructor instead
     function _getExistingDeploymentAdress(string memory name) internal view returns (address payable) {
         string memory root = vm.projectRoot();
-        string memory path = string.concat(root, "/deployments/", deploymentContext, "/", name, ".json");
+        string memory path = string(bytes.concat(bytes(root), "/deployments/", bytes(deploymentContext), "/", bytes(name), ".json"));
         try vm.readFile(path) returns (string memory json) {
             bytes memory addr = stdJson.parseRaw(json, ".address");
             return abi.decode(addr, (address));
@@ -415,7 +415,7 @@ contract GlobalDeployer is Deployer {
 
     function _getExistingDeployment(string memory name) internal view returns (Deployment memory deployment) {
         string memory root = vm.projectRoot();
-        string memory path = string.concat(root, "/deployments/", deploymentContext, "/", name, ".json");
+        string memory path = string(bytes.concat(bytes(root), "/deployments/", bytes(deploymentContext), "/", bytes(name), ".json"));
         try vm.readFile(path) returns (string memory json) {
             bytes memory addrBytes = stdJson.parseRaw(json, ".address");
             bytes memory bytecodeBytes = stdJson.parseRaw(json, ".bytecode");
